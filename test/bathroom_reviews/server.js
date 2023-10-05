@@ -49,7 +49,8 @@ app.get('/reviews', async (req, res) => {
   const result = await pool.query(`
       SELECT r.username, r.cleanliness, r.poopability, r.overall_rating, r.peacefulness, r.additional_comments, b.building_name, b.floor_number, b.gender
       FROM reviews r
-      JOIN bathroom b ON r.bathroom_id = b.bathroom_id;
+      JOIN bathroom b ON r.bathroom_id = b.bathroom_id
+      WHERE LOWER(b.gender) = LOWER($1);
   `);
   res.json(result.rows);
 });
@@ -64,7 +65,7 @@ app.get('/reviews/search', async (req, res) => {
       SELECT r.username, r.cleanliness, r.poopability, r.overall_rating, r.peacefulness, r.additional_comments, b.building_name, b.floor_number, b.gender
       FROM reviews r
       JOIN bathroom b ON r.bathroom_id = b.bathroom_id
-      WHERE b.building_name=$1 AND b.floor_number=$2 AND b.gender=$3;
+      WHERE LOWER(b.building_name)=LOWER($1) AND LOWER(b.floor_number)=LOWER($2) AND LOWER(b.gender)=LOWER($3);
   `, [building_name, floor, gender]);
 
   res.json(result.rows);
