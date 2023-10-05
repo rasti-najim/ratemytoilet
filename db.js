@@ -9,6 +9,7 @@ const pool = new Pool({
   database: "ratemytoilet",
 });
 
+
 const addReview = (review) => {
   return new Promise((resolve, reject) => {
     const query = 'INSERT INTO reviews(username, bathroom_id, cleanliness, poopability, overall_rating, peacefulness, additional_comments) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *';

@@ -62,4 +62,4 @@ FROM bathroom_reviews br
 JOIN bathroom b ON br.building_name = b.building_name AND br.floor_number = b.floor_number AND br.gender = b.gender;
 
 -- Drop the original table (optional)
--- DROP TABLE bathroom_reviews;
+DROP TABLE bathroom_reviews;
