@@ -5,7 +5,8 @@
     <title>RateMyToilet</title>
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="/static/css/example.css"> 
+    <link rel="stylesheet" href="/static/css/example.css">
+     
     <style>
         body {
             font-family: "Lato", sans-serif;
@@ -85,6 +86,44 @@
             transform: translateY(-5px);
         }
     </style>
+    
+    <!-- ... [the rest of the head section] -->
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const searchForm = document.querySelector("form[action='/search_reviews']");
+        const searchResultsContainer = document.querySelector(".main");
+
+        searchForm.addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const buildingName = searchForm.querySelector("input[name='building']").value;
+
+            fetch(`/search_reviews?building=${encodeURIComponent(buildingName)}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Clear previous search results
+                    searchResultsContainer.innerHTML = "<h2>Search Results</h2>";
+
+                    data.reviews.forEach(review => {
+                        const reviewTile = document.createElement("div");
+                        reviewTile.className = "review-tile";
+                        reviewTile.innerHTML = `
+                            <h3>${review['Building Name']}</h3>
+                            <p>${review['Username']}</p>
+                            <!-- ... [rest of the review details] -->
+                        `;
+                        searchResultsContainer.appendChild(reviewTile);
+                    });
+                })
+                .catch(error => {
+                    console.error("Error fetching reviews:", error);
+                });
+        });
+    });
+</script>
+
+
 </head>
 
 <style>
