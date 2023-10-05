@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Review - RateMyToilet</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;;
+            margin: 0;
+            padding: 0;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        select,
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 16px;
+        }
+
+        select {
+            height: 40px;
+        }
+
+        textarea {
+            resize: vertical;
+            height: 100px;
+        }
+
+        button[type="submit"] {
+            background-color: rgb(79, 97, 200);
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Add Review</h2>
+    <form action="/submit_review" method="POST">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="building_name">Building Name:</label>
+        <input type="text" id="building_name" name="building_name" required>
+
+        <label for="floor_number">Floor Number:</label>
+        <select id="floor_number" name="floor_number" required>
+            <option value="select">select</option>
+            <option value="1">-1</option>
+            <option value="2">-2</option>
+            <option value="3">1</option>
+            <option value="4">2</option>
+            <option value="5">3</option>
+            <option value="6">4</option>
+        </select>
+
+        <label for="gender">Gender:</label>
+        <select id="gender" name="gender" required>
+            <option value="select">select</option>
+            <option value="female">Female</option>
+            <option value="male">Male</option>
+            <option value="gender-neutral">Gender Neutral</option>
+        </select>
+
+        <label for="cleanliness">Cleanliness:</label>
+        <select id="cleanliness" name="cleanliness" required>
+            <option value="select">select</option>
+            <option value="1">1- the shit you just took</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5 - basically an operating room</option>
+        </select>
+
+        <label for="poopability">Poopability:</label>
+        <select id="poopability" name="poopability" required>
+            <option value="select">select</option>
+            <option value="1">1- would rather hold it</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5- let it rip</option>
+        </select>
+
+        <label for="cryability">Cryability:</label>
+        <select id="cryability" name="cryability" required>
+            <option value="select">select</option>
+            <option value="1">1- dry as a sahara desert</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5- niagra falls in this bitch</option>
+        </select>
+
+        <label for="peacefulness">Peacefulness:</label>
+        <select id="peacefulness" name="peacefulness" required>
+            <option value="select">select</option>
+            <option value="1">1 - am i at shooters?</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5 - an oasis</option>
+        </select>
+
+        <label for="overall_rating">Overall Rating:</label>
+        <select id="overall_rating" name="overall_rating" required>
+            <option value="select">select</option>
+            <option value="1">1 - star</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5- stars</option>
+        </select>
+
+        <label for="additional_comments">Additional Comments:</label>
+        <textarea id="additional_comments" name="additional_comments" rows="4"></textarea>
+
+        <button type="submit">Submit Review</button>
+    </form>
+</body>
+
+</html>

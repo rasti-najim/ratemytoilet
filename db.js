@@ -27,7 +27,12 @@ const addReview = (review) => {
 
 const viewReviews = (buildingName) => {
   return new Promise((resolve, reject) => {
-    const query = 'SELECT * FROM reviews WHERE building_name = $1';
+    const query = `
+      SELECT r.*, b.building_name, b.floor_number, b.gender
+      FROM reviews r
+      JOIN bathroom b ON r.bathroom_id = b.bathroom_id
+      WHERE b.building_name = $1
+    `;
     const params = [buildingName];
 
     pool.query(query, params, (error, results) => {
@@ -39,6 +44,8 @@ const viewReviews = (buildingName) => {
     });
   });
 };
+
+
 
 const highestReviewByOverallRating = (buildingName) => {
   return new Promise((resolve, reject) => {
