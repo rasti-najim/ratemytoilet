@@ -46,16 +46,20 @@ app.post('/reviews', async (req, res) => {
 
 
 app.get('/reviews', async (req, res) => {
-  const result = await pool.query(`
-      SELECT r.username, r.cleanliness, r.poopability, r.overall_rating, r.peacefulness, r.additional_comments, b.building_name, b.floor_number, b.gender
-      FROM reviews r
-      JOIN bathroom b ON r.bathroom_id = b.bathroom_id
-      WHERE LOWER(b.gender) = LOWER($1);
-  `);
-  res.json(result.rows);
+    let queryText = `
+        SELECT r.username, r.cleanliness, r.poopability, r.overall_rating, r.peacefulness, r.additional_comments, b.building_name, b.floor_number, b.gender
+        FROM reviews r
+        JOIN bathroom b ON r.bathroom_id = b.bathroom_id
+    `;
+
+    try {
+        const result = await pool.query(queryText);
+        res.json(result.rows);
+    } catch (error) {
+        console.error("Database error:", error);
+        res.status(500).send("Internal server error.");
+    }
 });
-
-
 
 
 app.get('/reviews/search', async (req, res) => {
@@ -65,11 +69,12 @@ app.get('/reviews/search', async (req, res) => {
       SELECT r.username, r.cleanliness, r.poopability, r.overall_rating, r.peacefulness, r.additional_comments, b.building_name, b.floor_number, b.gender
       FROM reviews r
       JOIN bathroom b ON r.bathroom_id = b.bathroom_id
-      WHERE LOWER(b.building_name)=LOWER($1) AND LOWER(b.floor_number)=LOWER($2) AND LOWER(b.gender)=LOWER($3);
+      WHERE LOWER(b.building_name)=LOWER($1) AND b.floor_number=$2 AND LOWER(b.gender)=LOWER($3);
   `, [building_name, floor, gender]);
 
   res.json(result.rows);
 });
+
 
 
 
