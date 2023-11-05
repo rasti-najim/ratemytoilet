@@ -46,6 +46,46 @@ document.getElementById('fetch-all-reviews').addEventListener('click', async () 
     document.getElementById('all-reviews').innerHTML = reviewsHtml;
 });
 
+function searchByCategory() {
+    // Get the selected category and rating from the input elements
+    const categorySelect = document.getElementById('categorySelect');
+    const category = categorySelect.value;
+  
+    const categoryRatingInput = document.getElementById('categoryRatingInput');
+    const rating = categoryRatingInput.value;
+  
+    // Fetch the reviews from the server
+    fetch(`/reviews/searchByCategory?category=${category}&rating=${rating}`)
+      .then(response => response.json())
+      .then(data => {
+        // Display the reviews in a card format
+        const reviewsByCategoryDiv = document.getElementById('reviewsByCategory');
+        reviewsByCategoryDiv.innerHTML = ''; // Clear any previous results
+  
+        data.forEach(review => {
+          // Construct the HTML for each review
+          const reviewCard = `
+            <div class="review-card">
+              <h3>${review.building_name}</h3>
+              <p>Floor: ${review.floor_number}</p>
+              <p>Gender: ${review.gender}</p>
+              <p>Username: ${review.username}</p>
+              <p>Cleanliness: ${review.cleanliness}</p>
+              <p>Poopability: ${review.poopability}</p>
+              <p>Overall Rating: ${review.overall_rating}</p>
+              <p>Peacefulness: ${review.peacefulness}</p>
+              <p>Comments: ${review.additional_comments}</p>
+            </div>`;
+          
+          // Append the review card HTML to the reviewsByCategoryDiv
+          reviewsByCategoryDiv.innerHTML += reviewCard;
+        });
+      })
+      .catch(error => console.error('Error fetching data:', error));
+  }
+  
+  
+  
 
 document.getElementById('search-reviews-form').addEventListener('submit', async (e) => {
     e.preventDefault();

@@ -59,6 +59,17 @@
     <button id="fetch-top-grades">Top Grades with Most Reviews</button>
     <div id="top-grades"></div>
 
+    <select id="categorySelect">
+        <option value="cleanliness">Cleanliness</option>
+        <option value="poopability">Poopability</option>
+        <option value="overall_rating">Overall Rating</option>
+        <option value="peacefulness">Peacefulness</option>
+    </select>
+    <input type="number" id="categoryRatingInput" placeholder="Enter rating" min="1" max="5" />
+    <button onclick="searchByCategory()">Search by Category</button>
+    <div id="reviewsByCategory"></div>
+      
+
 
     <!-- Scripts -->
     <script src="script.js"></script>

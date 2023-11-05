@@ -83,6 +83,33 @@ app.get('/reviews/most_by_user', async (req, res) => {
   res.json(result.rows[0]);
 });
 
+app.get('/reviews/searchByCategory', async (req, res) => {
+  const { category, rating } = req.query;
+
+  // Check if the category is valid
+  const validCategories = ['cleanliness', 'poopability', 'overall_rating', 'peacefulness'];
+  if (!validCategories.includes(category)) {
+    return res.status(400).send("Invalid category");
+  }
+
+  try {
+    const result = await pool.query(`
+      SELECT r.username, r.cleanliness, r.poopability, r.overall_rating, r.peacefulness, r.additional_comments, b.building_name, b.floor_number, b.gender
+      FROM reviews r
+      JOIN bathroom b ON r.bathroom_id = b.bathroom_id
+      WHERE r.${category} = $1;
+    `, [rating]);
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Database error:", error);
+    res.status(500).send("Internal server error.");
+  }
+});
+
+
+
+
 
 app.get('/reviews/top_grades', async (req, res) => {
   const result = await pool.query(`
