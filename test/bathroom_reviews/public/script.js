@@ -65,7 +65,7 @@ function searchByCategory() {
         data.forEach(review => {
           // Construct the HTML for each review
           const reviewCard = `
-            <div class="review-card">
+            <div class="card">
               <h3>${review.building_name}</h3>
               <p>Floor: ${review.floor_number}</p>
               <p>Gender: ${review.gender}</p>
