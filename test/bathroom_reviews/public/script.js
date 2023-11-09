@@ -26,11 +26,79 @@ document.getElementById('add-review-form').addEventListener('submit', async (e) 
     document.getElementById('add-review-form').reset();
 });
 
+/* async function likeReview(reviewId) {
+    try {
+        const response = await fetch('/reviews/like', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ review_id: reviewId }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+            const likeCountElement = document.querySelector(`#like-count-${reviewId}`);
+            if (likeCountElement) {
+                likeCountElement.textContent = parseInt(likeCountElement.textContent) + 1;
+            }
+        } else {
+            console.error('Failed to add like:', data.message);
+        }
+    } catch (error) {
+        console.error('Error liking review:', error);
+    }
+}*/
+
+async function likeReview(reviewId) {
+   
+    console.log('Attempting to like review with ID:', reviewId);
+    try {
+        const response = await fetch('/reviews/like', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ review_id: reviewId }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+            const likeCountElement = document.querySelector(`#like-count-${reviewId}`);
+            likeCountElement.textContent = parseInt(likeCountElement.textContent) + 1;
+        } else {
+            console.error('Failed to add like:', data.message);
+        }
+    } catch (error) {
+        console.error('Error liking review:', error);
+    }
+}
+
+
+/*async function likeReview(reviewId) {
+    try {
+        const response = await fetch('/reviews/like', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ review_id: reviewId }),
+        });
+        const data = await response.json();
+        if (data.message === "Like added successfully!") {
+            const likeCountElement = document.getElementById(`like-count-${reviewId}`);
+            likeCountElement.textContent = parseInt(likeCountElement.textContent) + 1;
+        } else {
+            console.error('Failed to add like:', data.message);
+        }
+    } catch (error) {
+        console.error('Error liking review:', error);
+    }
+}*/
+
 
 document.getElementById('fetch-all-reviews').addEventListener('click', async () => {
     const response = await fetch('/reviews');
     const reviews = await response.json();
-    
+
     const reviewsHtml = reviews.map(review => `
         <div class="card">
             <h3>${review.building_name} - Floor ${review.floor_number} (${review.gender})</h3>
@@ -40,11 +108,14 @@ document.getElementById('fetch-all-reviews').addEventListener('click', async () 
             <p><strong>Overall Rating:</strong> ${review.overall_rating}/5</p>
             <p><strong>Peacefulness:</strong> ${review.peacefulness}/5</p>
             <p><strong>Comments:</strong> ${review.additional_comments}</p>
+            <p><strong>Likes:</strong> <span id="like-count-${review.review_id}">${review.like_count}</span></p>
+            <button class="like-button" data-review-id="${review.review_id}">Like</button>
         </div>
     `).join('');
     
     document.getElementById('all-reviews').innerHTML = reviewsHtml;
 });
+
 
 function searchByCategory() {
     // Get the selected category and rating from the input elements
@@ -75,6 +146,8 @@ function searchByCategory() {
               <p>Overall Rating: ${review.overall_rating}</p>
               <p>Peacefulness: ${review.peacefulness}</p>
               <p>Comments: ${review.additional_comments}</p>
+              <p><strong>Likes:</strong> <span id="like-count-${review.review_id}">${review.like_count}</span></p>
+              <button class="like-button" data-review-id="${review.review_id}">Like</button>
             </div>`;
           
           // Append the review card HTML to the reviewsByCategoryDiv
@@ -83,8 +156,6 @@ function searchByCategory() {
       })
       .catch(error => console.error('Error fetching data:', error));
   }
-  
-  
   
 
 document.getElementById('search-reviews-form').addEventListener('submit', async (e) => {
@@ -102,6 +173,8 @@ document.getElementById('search-reviews-form').addEventListener('submit', async 
             <p><strong>Overall Rating:</strong> ${review.overall_rating}/5</p>
             <p><strong>Peacefulness:</strong> ${review.peacefulness}/5</p>
             <p><strong>Comments:</strong> ${review.additional_comments}</p>
+            <p><strong>Likes:</strong> <span id="like-count-${review.review_id}">${review.like_count}</span></p>
+            <button class="like-button" data-review-id="${review.review_id}">Like</button>
         </div>
     `).join('');
     
@@ -144,4 +217,69 @@ document.getElementById('hide-all-reviews1').addEventListener('click', () => {
     document.getElementById('search-results').innerHTML = '';
     document.getElementById('most-reviews').innerHTML = '';
     document.getElementById('top-grades').innerHTML = '';
+});
+
+
+
+document.addEventListener('click', function(event) {
+    if (event.target.classList.contains('like-button')) {
+        const reviewId = event.target.dataset.reviewId;
+        likeReview(reviewId);
+    }
+});
+
+
+
+document.getElementById('fetch-top-liked-reviews').addEventListener('click', async () => {
+    try {
+        const response = await fetch('/reviews/top_liked');
+        const reviews = await response.json();
+        
+        // Generate HTML for each review
+        const topReviewsHtml = reviews.map(review => `
+            <div class="card">
+                <h3>${review.building_name} - Floor ${review.floor_number} (${review.gender})</h3>
+                <p><strong>User:</strong> ${review.username}</p>
+                <p><strong>Cleanliness:</strong> ${review.cleanliness}/5</p>
+                <p><strong>Poopability:</strong> ${review.poopability}/5</p>
+                <p><strong>Overall Rating:</strong> ${review.overall_rating}/5</p>
+                <p><strong>Peacefulness:</strong> ${review.peacefulness}/5</p>
+                <p><strong>Comments:</strong> ${review.additional_comments}</p>
+                <p><strong>Likes:</strong> <span id="like-count-${review.review_id}">${review.like_count}</span></p>
+                <button class="like-button" data-review-id="${review.review_id}">Like</button>
+            </div>
+        `).join('');
+        
+        // Insert the reviews HTML into the DOM
+        const topReviewsContainer = document.getElementById('top-liked-reviews');
+        topReviewsContainer.innerHTML = topReviewsHtml;
+
+        // Add event listeners to each 'Like' button
+        document.querySelectorAll('.like-button').forEach(button => {
+            button.addEventListener('click', async (event) => {
+                const reviewId = event.target.getAttribute('data-review-id');
+                try {
+                    const response = await fetch('/reviews/like', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ review_id: reviewId })
+                    });
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const result = await response.json();
+                    
+                    // Update the like count in the DOM
+                    document.getElementById(`like-count-${reviewId}`).textContent = result.like_count;
+                } catch (error) {
+                    console.error('Error liking the review:', error);
+                }
+            });
+        });
+
+    } catch (error) {
+        console.error('Error fetching the top liked reviews:', error);
+    }
 });

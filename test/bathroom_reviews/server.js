@@ -46,19 +46,19 @@ app.post('/reviews', async (req, res) => {
 
 
 app.get('/reviews', async (req, res) => {
-    let queryText = `
-        SELECT r.username, r.cleanliness, r.poopability, r.overall_rating, r.peacefulness, r.additional_comments, b.building_name, b.floor_number, b.gender
-        FROM reviews r
-        JOIN bathroom b ON r.bathroom_id = b.bathroom_id
-    `;
+  let queryText = `
+      SELECT r.review_id, r.username, r.cleanliness, r.poopability, r.overall_rating, r.peacefulness, r.additional_comments, r.like_count, b.building_name, b.floor_number, b.gender
+      FROM reviews r
+      JOIN bathroom b ON r.bathroom_id = b.bathroom_id
+  `;
 
-    try {
-        const result = await pool.query(queryText);
-        res.json(result.rows);
-    } catch (error) {
-        console.error("Database error:", error);
-        res.status(500).send("Internal server error.");
-    }
+  try {
+      const result = await pool.query(queryText);
+      res.json(result.rows);
+  } catch (error) {
+      console.error("Database error:", error);
+      res.status(500).send("Internal server error.");
+  }
 });
 
 
@@ -66,7 +66,7 @@ app.get('/reviews/search', async (req, res) => {
   const { building_name, floor, gender } = req.query;
 
   const result = await pool.query(`
-      SELECT r.username, r.cleanliness, r.poopability, r.overall_rating, r.peacefulness, r.additional_comments, b.building_name, b.floor_number, b.gender
+      SELECT r.review_id, r.username, r.cleanliness, r.poopability, r.overall_rating, r.peacefulness, r.additional_comments, r.like_count, b.building_name, b.floor_number, b.gender
       FROM reviews r
       JOIN bathroom b ON r.bathroom_id = b.bathroom_id
       WHERE LOWER(b.building_name)=LOWER($1) AND b.floor_number=$2 AND LOWER(b.gender)=LOWER($3);
@@ -76,6 +76,24 @@ app.get('/reviews/search', async (req, res) => {
 });
 
 
+//get the top 10 most liked reviews:
+app.get('/reviews/top_liked', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT r.review_id, r.username, r.cleanliness, r.poopability, r.overall_rating, 
+             r.peacefulness, r.additional_comments, r.like_count, b.building_name, 
+             b.floor_number, b.gender
+      FROM reviews r
+      JOIN bathroom b ON r.bathroom_id = b.bathroom_id
+      ORDER BY r.like_count DESC
+      LIMIT 10;
+    `);
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Database error:", error);
+    res.status(500).send("Internal server error.");
+  }
+});
 
 
 app.get('/reviews/most_by_user', async (req, res) => {
@@ -94,7 +112,7 @@ app.get('/reviews/searchByCategory', async (req, res) => {
 
   try {
     const result = await pool.query(`
-      SELECT r.username, r.cleanliness, r.poopability, r.overall_rating, r.peacefulness, r.additional_comments, b.building_name, b.floor_number, b.gender
+      SELECT r.review_id, r.username, r.cleanliness, r.poopability, r.overall_rating, r.peacefulness, r.additional_comments, r.like_count, b.building_name, b.floor_number, b.gender
       FROM reviews r
       JOIN bathroom b ON r.bathroom_id = b.bathroom_id
       WHERE r.${category} = $1;
@@ -108,7 +126,30 @@ app.get('/reviews/searchByCategory', async (req, res) => {
 });
 
 
+// allow users to like reviews
+app.post('/reviews/like', async (req, res) => {
+  const { review_id } = req.body;
+  console.log(review_id);
 
+  // Check if review_id is a valid UUID
+  // if (!validateUUID(review_id)) {
+  //   console.log(`test: ${review_id}`)
+  //   return res.status(400).send("Invalid review_id");
+  // }
+
+  try {
+    const result = await pool.query(`UPDATE reviews SET like_count = like_count + 1 WHERE review_id = $1 RETURNING like_count`, [review_id]);
+    if (result.rows.length > 0) {
+      const newLikeCount = result.rows[0].like_count;
+      res.json({ like_count: newLikeCount });
+    } else {
+      res.status(404).send("Review not found.");
+    }
+  } catch (error) {
+    console.error("Database error:", error);
+    res.status(500).send("Internal server error.");
+  }
+});
 
 
 app.get('/reviews/top_grades', async (req, res) => {
