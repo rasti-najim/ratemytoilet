@@ -217,6 +217,8 @@ document.getElementById('hide-all-reviews1').addEventListener('click', () => {
     document.getElementById('search-results').innerHTML = '';
     document.getElementById('most-reviews').innerHTML = '';
     document.getElementById('top-grades').innerHTML = '';
+    document.getElementById('top-liked-reviews').innerHTML = '';
+    document.getElementById('reviewsByCategory').innerHTML = '';
 });
 
 

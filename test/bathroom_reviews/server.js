@@ -131,12 +131,6 @@ app.post('/reviews/like', async (req, res) => {
   const { review_id } = req.body;
   console.log(review_id);
 
-  // Check if review_id is a valid UUID
-  // if (!validateUUID(review_id)) {
-  //   console.log(`test: ${review_id}`)
-  //   return res.status(400).send("Invalid review_id");
-  // }
-
   try {
     const result = await pool.query(`UPDATE reviews SET like_count = like_count + 1 WHERE review_id = $1 RETURNING like_count`, [review_id]);
     if (result.rows.length > 0) {
