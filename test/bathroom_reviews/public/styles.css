@@ -21,6 +21,35 @@ form, button {
     border-radius: 5px;
 }
 
+/* Style for the navigation bar */
+nav {
+    background-color: #333; /* Dark grey background */
+    overflow: hidden; /* Ensures the nav content is inside the nav bar */
+}
+
+/* Style for the links inside the navigation bar */
+nav a {
+    float: left; /* Aligns the links to the left */
+    display: block; /* Changes links from inline to block-level elements */
+    color: white; /* White text color */
+    text-align: center; /* Centers text inside the links */
+    padding: 14px 16px; /* Adds padding inside the links */
+    text-decoration: none; /* Removes underline from links */
+}
+
+/* Changes the color of links on hover */
+nav a:hover {
+    background-color: #ddd; /* Light grey background on hover */
+    color: black; /* Black text color on hover */
+}
+
+/* Style for the active/current link */
+nav a.active {
+    background-color: #04AA6D; /* Green background for the active link */
+    color: white; /* White text color for the active link */
+}
+
+
 form {
     display: flex;
     flex-direction: column;

@@ -1,0 +1,38 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Rate My Toilet - Search By Category</title>
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+        
+<nav>
+    <a href="index.html">Home</a> |
+    <a href="all_reviews.html">All Reviews</a> |
+    <a href="search_reviews.html">Search Reviews</a> |
+    <a href="most_reviews_user.html">Most Reviews by User</a> |
+    <a href="top_liked_reviews.html">Top Liked Reviews</a> |
+    <a href="top_grade_reviews.html">Top Grade Reviews</a> |
+    <a href="search_by_category.html">Search by Category</a>
+</nav>
+
+    
+
+        <h2>Search by Category</h2>
+        <select id="categorySelect">
+            <option value="cleanliness">Cleanliness</option>
+            <option value="poopability">Poopability</option>
+            <option value="overall_rating">Overall Rating</option>
+            <option value="peacefulness">Peacefulness</option>
+        </select>
+        <input type="number" id="categoryRatingInput" placeholder="Enter rating" min="1" max="5" />
+        <button onclick="searchByCategory()">Search by Category</button>
+        <div id="reviewsByCategory"></div>
+    
+        <script src="script.js"></script>
+    </body>
+    </html>
+    

@@ -1,17 +1,26 @@
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rate my toilet</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
-    <!-- Add Review Form -->
+    
+<nav>
+    <a href="index.html">Home</a> |
+    <a href="all_reviews.html">All Reviews</a> |
+    <a href="search_reviews.html">Search Reviews</a> |
+    <a href="most_reviews_user.html">Most Reviews by User</a> |
+    <a href="top_liked_reviews.html">Top Liked Reviews</a> |
+    <a href="top_grade_reviews.html">Top Grade Reviews</a> |
+    <a href="search_by_category.html">Search by Category</a>
+</nav>
+
     <h2>Rate my toilet</h2>
-    <h2>Submit a form</h2>
+    <h2>Submit a Review</h2>
     <form id="add-review-form">
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required>
@@ -29,58 +38,6 @@
         <textarea id="additional_comments" placeholder="Additional Comments"></textarea>
         <button type="submit">Submit Review</button>
     </form>
-
-    <!-- Fetch All Reviews -->
-    <button id="fetch-all-reviews">Fetch All Reviews</button>
-    <button id="hide-all-reviews1">Clear all output</button>
-    <div id="all-reviews"></div>
-
-    <!-- Search Reviews Form -->
-    <h2>Search Reviews</h2>
-    <form id="search-reviews-form">
-        <input type="text" id="search-building_name" placeholder="Building Name" required>
-        <input type="number" id="search-floor" placeholder="Floor" required>
-        <select id="search-gender">
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="gender neutral">Gender Neutral</option>
-        </select>
-        <button type="submit">Search</button>
-    </form>
-    <div id="search-results"></div>
-
-
-    <!-- Fetch Most Reviews By Username -->
-    <h2>Most Reviews by User</h2>
-    <button id="fetch-most-reviews">Which User Left the Most Reviews?</button>
-    <div id="most-reviews"></div>
-
-    <!-- Fetch Top 10 Most Liked Reviews -->
-    <h2>Top 10 Most Liked Reviews</h2>
-    <button id="fetch-top-liked-reviews"> People's Favorite Reviews!</button>
-    <div id="top-liked-reviews"></div>
-
-
-    <!-- Fetch Top Grades with Most Reviews -->
-    <h2>Top Grade Review</h2>
-    <button id="fetch-top-grades">Top Grades with Most Reviews</button>
-    <div id="top-grades"></div>
-
-    <h2>Search by Category</h2>
-    <select id="categorySelect">
-        <option value="cleanliness">Cleanliness</option>
-        <option value="poopability">Poopability</option>
-        <option value="overall_rating">Overall Rating</option>
-        <option value="peacefulness">Peacefulness</option>
-    </select>
-    <input type="number" id="categoryRatingInput" placeholder="Enter rating" min="1" max="5" />
-    <button onclick="searchByCategory()">Search by Category</button>
-    <div id="reviewsByCategory"></div>
-      
-
-
-    <!-- Scripts -->
     <script src="script.js"></script>
 </body>
-
 </html>

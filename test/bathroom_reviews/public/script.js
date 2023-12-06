@@ -26,28 +26,6 @@ document.getElementById('add-review-form').addEventListener('submit', async (e) 
     document.getElementById('add-review-form').reset();
 });
 
-/* async function likeReview(reviewId) {
-    try {
-        const response = await fetch('/reviews/like', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ review_id: reviewId }),
-        });
-        const data = await response.json();
-        if (response.ok) {
-            const likeCountElement = document.querySelector(`#like-count-${reviewId}`);
-            if (likeCountElement) {
-                likeCountElement.textContent = parseInt(likeCountElement.textContent) + 1;
-            }
-        } else {
-            console.error('Failed to add like:', data.message);
-        }
-    } catch (error) {
-        console.error('Error liking review:', error);
-    }
-}*/
 
 async function likeReview(reviewId) {
    
@@ -73,29 +51,7 @@ async function likeReview(reviewId) {
 }
 
 
-/*async function likeReview(reviewId) {
-    try {
-        const response = await fetch('/reviews/like', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ review_id: reviewId }),
-        });
-        const data = await response.json();
-        if (data.message === "Like added successfully!") {
-            const likeCountElement = document.getElementById(`like-count-${reviewId}`);
-            likeCountElement.textContent = parseInt(likeCountElement.textContent) + 1;
-        } else {
-            console.error('Failed to add like:', data.message);
-        }
-    } catch (error) {
-        console.error('Error liking review:', error);
-    }
-}*/
-
-
-document.getElementById('fetch-all-reviews').addEventListener('click', async () => {
+async function fetchAndRenderAllReviews() {
     const response = await fetch('/reviews');
     const reviews = await response.json();
 
@@ -114,7 +70,11 @@ document.getElementById('fetch-all-reviews').addEventListener('click', async () 
     `).join('');
     
     document.getElementById('all-reviews').innerHTML = reviewsHtml;
-});
+}
+
+
+
+
 
 
 function searchByCategory() {
@@ -158,28 +118,53 @@ function searchByCategory() {
   }
   
 
-document.getElementById('search-reviews-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('search-reviews-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-    const response = await fetch(`/reviews/search?building_name=${document.getElementById('search-building_name').value}&floor=${document.getElementById('search-floor').value}&gender=${document.getElementById('search-gender').value}`);
-    const reviews = await response.json();
-    
-    const reviewsHtml = reviews.map(review => `
-        <div class="card">
-            <h3>${review.building_name} - Floor ${review.floor_number} (${review.gender})</h3>
-            <p><strong>User:</strong> ${review.username}</p>
-            <p><strong>Cleanliness:</strong> ${review.cleanliness}/5</p>
-            <p><strong>Poopability:</strong> ${review.poopability}/5</p>
-            <p><strong>Overall Rating:</strong> ${review.overall_rating}/5</p>
-            <p><strong>Peacefulness:</strong> ${review.peacefulness}/5</p>
-            <p><strong>Comments:</strong> ${review.additional_comments}</p>
-            <p><strong>Likes:</strong> <span id="like-count-${review.review_id}">${review.like_count}</span></p>
-            <button class="like-button" data-review-id="${review.review_id}">Like</button>
-        </div>
-    `).join('');
-    
-    document.getElementById('search-results').innerHTML = reviewsHtml;
+        // Retrieve input values
+        const buildingName = document.getElementById('search-building_name').value;
+        const floor = document.getElementById('search-floor').value;
+        const gender = document.getElementById('search-gender').value;
+
+        try {
+            // Make the fetch request
+            const response = await fetch(`/reviews/search?building_name=${encodeURIComponent(buildingName)}&floor=${encodeURIComponent(floor)}&gender=${encodeURIComponent(gender)}`);
+
+            // Check if the response is OK
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            // Parse the JSON response
+            const reviews = await response.json();
+
+            // Generate HTML for the reviews
+            const reviewsHtml = reviews.map(review => `
+                <div class="card">
+                    <h3>${review.building_name} - Floor ${review.floor_number} (${review.gender})</h3>
+                    <p><strong>User:</strong> ${review.username}</p>
+                    <p><strong>Cleanliness:</strong> ${review.cleanliness}/5</p>
+                    <p><strong>Poopability:</strong> ${review.poopability}/5</p>
+                    <p><strong>Overall Rating:</strong> ${review.overall_rating}/5</p>
+                    <p><strong>Peacefulness:</strong> ${review.peacefulness}/5</p>
+                    <p><strong>Comments:</strong> ${review.additional_comments}</p>
+                    <p><strong>Likes:</strong> <span id="like-count-${review.review_id}">${review.like_count}</span></p>
+                    <button class="like-button" data-review-id="${review.review_id}">Like</button>
+                </div>
+            `).join('');
+
+            // Update the DOM with the reviews
+            document.getElementById('search-results').innerHTML = reviewsHtml;
+
+        } catch (error) {
+            console.error('Error fetching reviews:', error);
+            // Optionally, update the UI to reflect the error
+            document.getElementById('search-results').innerHTML = `<p>Error loading reviews.</p>`;
+        }
+    });
 });
+
 
 document.getElementById('fetch-most-reviews').addEventListener('click', async () => {
     const response = await fetch('/reviews/most_by_user');
@@ -196,7 +181,22 @@ document.getElementById('fetch-most-reviews').addEventListener('click', async ()
 });
 
 
-document.getElementById('fetch-top-grades').addEventListener('click', async () => {
+
+async function handleMostReviews() {
+    const response = await fetch('/reviews/most_by_user');
+    const user = await response.json();
+    
+    const userHtml = `
+        <div class="card">
+            <h3>${user.username}</h3>
+            <p><strong>Review Count:</strong> ${user.review_count}</p>
+        </div>
+    `;
+    
+    document.getElementById('most-reviews').innerHTML = userHtml;
+}
+
+async function topGrades(){
     const response = await fetch('/reviews/top_grades');
     const grades = await response.json();
     
@@ -208,18 +208,18 @@ document.getElementById('fetch-top-grades').addEventListener('click', async () =
     `).join('');
     
     document.getElementById('top-grades').innerHTML = gradesHtml;
-});
+};
 
 
 
-document.getElementById('hide-all-reviews1').addEventListener('click', () => {
+async function handleClearReviews() {
     document.getElementById('all-reviews').innerHTML = '';
     document.getElementById('search-results').innerHTML = '';
     document.getElementById('most-reviews').innerHTML = '';
     document.getElementById('top-grades').innerHTML = '';
     document.getElementById('top-liked-reviews').innerHTML = '';
     document.getElementById('reviewsByCategory').innerHTML = '';
-});
+}
 
 
 
@@ -248,7 +248,6 @@ document.getElementById('fetch-top-liked-reviews').addEventListener('click', asy
                 <p><strong>Peacefulness:</strong> ${review.peacefulness}/5</p>
                 <p><strong>Comments:</strong> ${review.additional_comments}</p>
                 <p><strong>Likes:</strong> <span id="like-count-${review.review_id}">${review.like_count}</span></p>
-                <button class="like-button" data-review-id="${review.review_id}">Like</button>
             </div>
         `).join('');
         
