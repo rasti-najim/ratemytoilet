@@ -56,6 +56,13 @@ form {
     gap: 10px;
 }
 
+#categoryRatingInput {
+    width: 50px; /* Adjust this value as needed */
+    height: 20px; /* Adjust this value as needed */
+    font-size: 20px; /* Adjust this value as needed */
+    padding: 5px; /* Adjust for padding inside the input box */
+}
+
 input, select, textarea, button {
     padding: 10px;
     font-size: 16px;

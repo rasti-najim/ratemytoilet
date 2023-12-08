@@ -66,10 +66,34 @@ async function fetchAndRenderAllReviews() {
             <p><strong>Comments:</strong> ${review.additional_comments}</p>
             <p><strong>Likes:</strong> <span id="like-count-${review.review_id}">${review.like_count}</span></p>
             <button class="like-button" data-review-id="${review.review_id}">Like</button>
-        </div>
+            </div>
     `).join('');
     
     document.getElementById('all-reviews').innerHTML = reviewsHtml;
+
+    document.querySelectorAll('.like-button').forEach(button => {
+        button.addEventListener('click', async (event) => {
+            const reviewId = event.target.getAttribute('data-review-id');
+            try {
+                const response = await fetch('/reviews/like', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ review_id: reviewId })
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const result = await response.json();
+                
+                // Update the like count in the DOM
+                document.getElementById(`like-count-${reviewId}`).textContent = result.like_count;
+            } catch (error) {
+                console.error('Error liking the review:', error);
+            }
+        });
+    });
 }
 
 
@@ -113,73 +137,37 @@ function searchByCategory() {
           // Append the review card HTML to the reviewsByCategoryDiv
           reviewsByCategoryDiv.innerHTML += reviewCard;
         });
+
+        document.querySelectorAll('.like-button').forEach(button => {
+            button.addEventListener('click', async (event) => {
+                const reviewId = event.target.getAttribute('data-review-id');
+                try {
+                    const response = await fetch('/reviews/like', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ review_id: reviewId })
+                    });
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const result = await response.json();
+                    
+                    // Update the like count in the DOM
+                    document.getElementById(`like-count-${reviewId}`).textContent = result.like_count;
+                } catch (error) {
+                    console.error('Error liking the review:', error);
+                }
+            });
+        });
       })
       .catch(error => console.error('Error fetching data:', error));
+
+      
   }
   
 
-// Add this function to your script.js file
-
-document.addEventListener('DOMContentLoaded', function() {
-    const searchForm = document.getElementById('search-reviews-form');
-
-    searchForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        // Get the user input values
-        const buildingName = document.getElementById('search-building_name').value;
-        const floor = document.getElementById('search-floor').value;
-        const gender = document.getElementById('search-gender').value;
-
-        // Construct the search query object
-        const searchQuery = {
-            buildingName: buildingName,
-            floor: floor,
-            gender: gender
-        };
-
-        // Make an AJAX request to your server
-        fetch('/api/searchReviews', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(searchQuery),
-        })
-        .then(response => response.json())
-        .then(data => {
-            displaySearchResults(data);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-    });
-});
-
-// Function to display search results
-function displaySearchResults(results) {
-    const resultsDiv = document.getElementById('search-results');
-    resultsDiv.innerHTML = ''; // Clear previous results
-
-    if (results.length === 0) {
-        resultsDiv.innerHTML = '<p>No reviews found.</p>';
-        return;
-    }
-
-    results.forEach(review => {
-        const reviewElement = document.createElement('div');
-        reviewElement.innerHTML = `
-            <p>Building: ${review.building_name}</p>
-            <p>Floor: ${review.floor_number}</p>
-            <p>Gender: ${review.gender}</p>
-            <p>Cleanliness: ${review.cleanliness}</p>
-            <p>Poopability: ${review.poopability}</p>
-            <p>Cryability: ${review.cryability}</p>
-            <p>Peacefulness: ${review.peacefulness}</p>
-        `;
-        resultsDiv.appendChild(reviewElement);
-    });
-}
 
 
 
@@ -196,6 +184,48 @@ document.getElementById('fetch-most-reviews').addEventListener('click', async ()
     
     document.getElementById('most-reviews').innerHTML = userHtml;
 });
+
+
+
+document.addEventListener('DOMContentLoaded', (event) => {
+    document.getElementById('search-reviews-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Get the values from the form
+        const buildingName = document.getElementById('search-building_name').value;
+        const floor = document.getElementById('search-floor').value;
+        const gender = document.getElementById('search-gender').value;
+
+        try {
+            // Send a GET request to your server's /reviews/search endpoint
+            const response = await fetch(`/reviews/search?building_name=${encodeURIComponent(buildingName)}&floor=${floor}&gender=${encodeURIComponent(gender)}`, {
+                method: 'GET'
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            // Assuming the response is a JSON object containing the search results
+            const data = await response.json();
+
+            // Update the DOM with the search results
+            const resultsDiv = document.getElementById('search-results');
+            resultsDiv.innerHTML = ''; // Clear previous results
+
+            // Create and append elements for each result
+            data.forEach(review => {
+                const div = document.createElement('div');
+                div.className = 'review';
+                div.innerHTML = `<h3>${review.building_name} - Floor: ${review.floor_number} (${review.gender})</h3><p>Cleanliness: ${review.cleanliness}, Poopability: ${review.poopability}, Overall Rating: ${review.overall_rating}, Peacefulness: ${review.peacefulness}, Comments: ${review.additional_comments}, Likes: ${review.like_count}</p>`;
+                resultsDiv.appendChild(div);
+            });
+        } catch (error) {
+            console.error('There was a problem with the fetch operation:', error);
+        }
+    });
+});
+
 
 
 
@@ -248,8 +278,7 @@ document.addEventListener('click', function(event) {
 });
 
 
-
-document.getElementById('fetch-top-liked-reviews').addEventListener('click', async () => {
+async function fetchTopLiked() {
     try {
         const response = await fetch('/reviews/top_liked');
         const reviews = await response.json();
@@ -265,6 +294,7 @@ document.getElementById('fetch-top-liked-reviews').addEventListener('click', asy
                 <p><strong>Peacefulness:</strong> ${review.peacefulness}/5</p>
                 <p><strong>Comments:</strong> ${review.additional_comments}</p>
                 <p><strong>Likes:</strong> <span id="like-count-${review.review_id}">${review.like_count}</span></p>
+                <button class="like-button" data-review-id="${review.review_id}">Like</button>
             </div>
         `).join('');
         
@@ -300,4 +330,4 @@ document.getElementById('fetch-top-liked-reviews').addEventListener('click', asy
     } catch (error) {
         console.error('Error fetching the top liked reviews:', error);
     }
-});
+};

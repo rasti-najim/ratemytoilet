@@ -47,10 +47,11 @@ app.post('/reviews', async (req, res) => {
 
 app.get('/reviews', async (req, res) => {
   let queryText = `
-      SELECT r.review_id, r.username, r.cleanliness, r.poopability, r.overall_rating, r.peacefulness, r.additional_comments, r.like_count, b.building_name, b.floor_number, b.gender
-      FROM reviews r
-      JOIN bathroom b ON r.bathroom_id = b.bathroom_id
-  `;
+    SELECT rs.review_id, rs.username, rs.cleanliness, rs.poopability, rs.overall_rating, rs.peacefulness, rs.additional_comments, rs.like_count, b.building_name, b.floor_number, b.gender
+    FROM reviews rs
+    JOIN bathroom b ON rs.bathroom_id = b.bathroom_id
+`;
+
 
   try {
       const result = await pool.query(queryText);
