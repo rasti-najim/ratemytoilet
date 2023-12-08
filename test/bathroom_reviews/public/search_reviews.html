@@ -19,13 +19,9 @@
     <a href="search_by_category.html">Search by Category</a>
 </nav>
 
-<form id="add-review-form">
-   
-    <button type="submit">Submit Review</button>
-</form>
 
         <h2>Search Reviews</h2>
-        <form id="search-reviews-form">
+        <form id="search-reviews-form" onsubmit="displaySearchResults()"> 
             <input type="text" id="search-building_name" placeholder="Building Name" required>
             <input type="number" id="search-floor" placeholder="Floor" required>
             <select id="search-gender">

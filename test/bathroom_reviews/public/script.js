@@ -118,52 +118,69 @@ function searchByCategory() {
   }
   
 
-  document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('search-reviews-form').addEventListener('submit', async (e) => {
+// Add this function to your script.js file
+
+document.addEventListener('DOMContentLoaded', function() {
+    const searchForm = document.getElementById('search-reviews-form');
+
+    searchForm.addEventListener('submit', function(e) {
         e.preventDefault();
 
-        // Retrieve input values
+        // Get the user input values
         const buildingName = document.getElementById('search-building_name').value;
         const floor = document.getElementById('search-floor').value;
         const gender = document.getElementById('search-gender').value;
 
-        try {
-            // Make the fetch request
-            const response = await fetch(`/reviews/search?building_name=${encodeURIComponent(buildingName)}&floor=${encodeURIComponent(floor)}&gender=${encodeURIComponent(gender)}`);
+        // Construct the search query object
+        const searchQuery = {
+            buildingName: buildingName,
+            floor: floor,
+            gender: gender
+        };
 
-            // Check if the response is OK
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            // Parse the JSON response
-            const reviews = await response.json();
-
-            // Generate HTML for the reviews
-            const reviewsHtml = reviews.map(review => `
-                <div class="card">
-                    <h3>${review.building_name} - Floor ${review.floor_number} (${review.gender})</h3>
-                    <p><strong>User:</strong> ${review.username}</p>
-                    <p><strong>Cleanliness:</strong> ${review.cleanliness}/5</p>
-                    <p><strong>Poopability:</strong> ${review.poopability}/5</p>
-                    <p><strong>Overall Rating:</strong> ${review.overall_rating}/5</p>
-                    <p><strong>Peacefulness:</strong> ${review.peacefulness}/5</p>
-                    <p><strong>Comments:</strong> ${review.additional_comments}</p>
-                    <p><strong>Likes:</strong> <span id="like-count-${review.review_id}">${review.like_count}</span></p>
-                    <button class="like-button" data-review-id="${review.review_id}">Like</button>
-                </div>
-            `).join('');
-
-            // Update the DOM with the reviews
-            document.getElementById('search-results').innerHTML = reviewsHtml;
-
-        } catch (error) {
-            console.error('Error fetching reviews:', error);
-            // Optionally, update the UI to reflect the error
-            document.getElementById('search-results').innerHTML = `<p>Error loading reviews.</p>`;
-        }
+        // Make an AJAX request to your server
+        fetch('/api/searchReviews', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(searchQuery),
+        })
+        .then(response => response.json())
+        .then(data => {
+            displaySearchResults(data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
     });
 });
+
+// Function to display search results
+function displaySearchResults(results) {
+    const resultsDiv = document.getElementById('search-results');
+    resultsDiv.innerHTML = ''; // Clear previous results
+
+    if (results.length === 0) {
+        resultsDiv.innerHTML = '<p>No reviews found.</p>';
+        return;
+    }
+
+    results.forEach(review => {
+        const reviewElement = document.createElement('div');
+        reviewElement.innerHTML = `
+            <p>Building: ${review.building_name}</p>
+            <p>Floor: ${review.floor_number}</p>
+            <p>Gender: ${review.gender}</p>
+            <p>Cleanliness: ${review.cleanliness}</p>
+            <p>Poopability: ${review.poopability}</p>
+            <p>Cryability: ${review.cryability}</p>
+            <p>Peacefulness: ${review.peacefulness}</p>
+        `;
+        resultsDiv.appendChild(reviewElement);
+    });
+}
+
 
 
 document.getElementById('fetch-most-reviews').addEventListener('click', async () => {
