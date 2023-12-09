@@ -124,6 +124,14 @@ async function fetchAndRenderAllReviews() {
             }
         });
     });
+    document.querySelectorAll('.share-btn').forEach(button => {
+        button.addEventListener('click', async (event) => {
+            const reviewCard = event.target.closest('.card');
+            if (reviewCard) {
+                await shareReview(reviewCard);
+            }
+        });
+    });
 }
 
 
@@ -185,6 +193,14 @@ function searchByCategory() {
                     document.getElementById(`like-count-${reviewId}`).textContent = result.like_count;
                 } catch (error) {
                     console.error('Error liking the review:', error);
+                }
+            });
+        });
+        document.querySelectorAll('.share-btn').forEach(button => {
+            button.addEventListener('click', async (event) => {
+                const reviewCard = event.target.closest('.card');
+                if (reviewCard) {
+                    await shareReview(reviewCard);
                 }
             });
         });
@@ -360,6 +376,14 @@ async function fetchTopLiked() {
                 }
             });
         });
+        document.querySelectorAll('.share-btn').forEach(button => {
+            button.addEventListener('click', async (event) => {
+                const reviewCard = event.target.closest('.card');
+                if (reviewCard) {
+                    await shareReview(reviewCard);
+                }
+            });
+        });
 
     } catch (error) {
         console.error('Error fetching the top liked reviews:', error);
@@ -367,8 +391,8 @@ async function fetchTopLiked() {
 };
 
 
-function shareReview(reviewElement) {
-    const reviewContent = reviewElement.textContent.trim();
+async function shareReview(reviewCard) {
+    const reviewContent = reviewCard.textContent.trim();
     const tweetText = encodeURIComponent(`RateMyToilet Review: ${reviewContent}`);
     const twitterShareUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
     window.open(twitterShareUrl, '_blank');

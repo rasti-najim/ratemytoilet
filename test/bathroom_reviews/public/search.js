@@ -66,9 +66,24 @@ document.addEventListener('DOMContentLoaded', (event) => {
                     }
                 });
             });
+            document.querySelectorAll('.share-btn').forEach(button => {
+                button.addEventListener('click', async (event) => {
+                    const reviewCard = event.target.closest('.card');
+                    if (reviewCard) {
+                        await shareReview(reviewCard);
+                    }
+                });
+            });    
             
         } catch (error) {
             console.error('There was a problem with the fetch operation:', error);
         }
     });
 });
+
+async function shareReview(reviewCard) {
+    const reviewContent = reviewCard.textContent.trim();
+    const tweetText = encodeURIComponent(`RateMyToilet Review: ${reviewContent}`);
+    const twitterShareUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
+    window.open(twitterShareUrl, '_blank');
+}
