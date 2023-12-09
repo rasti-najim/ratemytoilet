@@ -1,29 +1,58 @@
-document.getElementById('add-review-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const response = await fetch('/reviews', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            username: document.getElementById('username').value,
-            building_name: document.getElementById('building_name').value,
-            floor: document.getElementById('floor').value,
-            gender: document.getElementById('gender').value,
-            cleanliness: document.getElementById('cleanliness').value,
-            poopability: document.getElementById('poopability').value,
-            overall_rating: document.getElementById('overall_rating').value,
-            peacefulness: document.getElementById('peacefulness').value,
-            additional_comments: document.getElementById('additional_comments').value,
-        }),
+document.addEventListener('DOMContentLoaded', (event) => {
+    // Existing code for form submission
+    document.getElementById('add-review-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+    
+        const response = await fetch('/reviews', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: document.getElementById('username').value,
+                building_name: document.getElementById('building_name').value,
+                floor: document.getElementById('floor').value,
+                gender: document.getElementById('gender').value,
+                cleanliness: document.getElementById('cleanliness').value,
+                poopability: document.getElementById('poopability').value,
+                overall_rating: document.getElementById('overall_rating').value,
+                peacefulness: document.getElementById('peacefulness').value,
+                additional_comments: document.getElementById('additional_comments').value,
+            }),
+        });
+    
+        const data = await response.json();
+        alert(data.message);
+    
+        // Reset the form after successful submission
+        document.getElementById('add-review-form').reset();
     });
 
-    const data = await response.json();
-    alert(data.message);
+    // Functionality to fetch and display a random review
+    document.getElementById('random-review-btn').addEventListener('click', async () => {
+        try {
+            const response = await fetch('/random-review');
+            const randomReview = await response.json();
+            displayRandomReview(randomReview);
+        } catch (error) {
+            console.error('Error fetching random review:', error);
+        }
+    });
 
-    // Reset the form after successful submission
-    document.getElementById('add-review-form').reset();
+    function displayRandomReview(randomReview) {
+        const container = document.getElementById('random-review-container');
+        const reviewHtml = `
+            <div class="review-card">
+                <h3>${randomReview.building_name} - Floor ${randomReview.floor_number} (${randomReview.gender})</h3>
+                <p>Cleanliness: ${randomReview.cleanliness}/5</p>
+                <p>Poopability: ${randomReview.poopability}/5</p>
+                <p>Overall Rating: ${randomReview.overall_rating}/5</p>
+                <p>Peacefulness: ${randomReview.peacefulness}/5</p>
+                <p>Comments: ${randomReview.additional_comments}</p>
+                <p>Likes: ${randomReview.like_count}</p>
+            </div>`;
+        container.innerHTML = reviewHtml;
+    }
 });
 
 
@@ -66,6 +95,7 @@ async function fetchAndRenderAllReviews() {
             <p><strong>Comments:</strong> ${review.additional_comments}</p>
             <p><strong>Likes:</strong> <span id="like-count-${review.review_id}">${review.like_count}</span></p>
             <button class="like-button" data-review-id="${review.review_id}">Like</button>
+            <button class="share-btn">Share</button>
             </div>
     `).join('');
     
@@ -95,10 +125,6 @@ async function fetchAndRenderAllReviews() {
         });
     });
 }
-
-
-
-
 
 
 function searchByCategory() {
@@ -132,6 +158,7 @@ function searchByCategory() {
               <p>Comments: ${review.additional_comments}</p>
               <p><strong>Likes:</strong> <span id="like-count-${review.review_id}">${review.like_count}</span></p>
               <button class="like-button" data-review-id="${review.review_id}">Like</button>
+              <button class="share-btn">Share</button>
             </div>`;
           
           // Append the review card HTML to the reviewsByCategoryDiv
@@ -168,9 +195,6 @@ function searchByCategory() {
   }
   
 
-
-
-
 document.getElementById('fetch-most-reviews').addEventListener('click', async () => {
     const response = await fetch('/reviews/most_by_user');
     const user = await response.json();
@@ -188,6 +212,15 @@ document.getElementById('fetch-most-reviews').addEventListener('click', async ()
 
 
 document.addEventListener('DOMContentLoaded', (event) => {
+    document.body.addEventListener('click', function(event) {
+        if (event.target.classList.contains('share-btn')) {
+            const reviewCard = event.target.closest('.card').textContent;
+            if (reviewCard) {
+                shareReview(reviewCard);
+            }
+        }
+    });
+
     document.getElementById('search-reviews-form').addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -295,6 +328,7 @@ async function fetchTopLiked() {
                 <p><strong>Comments:</strong> ${review.additional_comments}</p>
                 <p><strong>Likes:</strong> <span id="like-count-${review.review_id}">${review.like_count}</span></p>
                 <button class="like-button" data-review-id="${review.review_id}">Like</button>
+                <button class="share-btn">Share</button>
             </div>
         `).join('');
         
@@ -331,3 +365,11 @@ async function fetchTopLiked() {
         console.error('Error fetching the top liked reviews:', error);
     }
 };
+
+
+function shareReview(reviewElement) {
+    const reviewContent = reviewElement.textContent.trim();
+    const tweetText = encodeURIComponent(`RateMyToilet Review: ${reviewContent}`);
+    const twitterShareUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
+    window.open(twitterShareUrl, '_blank');
+}

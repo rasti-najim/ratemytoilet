@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
                     <p><strong>Comments:</strong> ${review.additional_comments}</p>
                     <p><strong>Likes:</strong> <span id="like-count-${review.review_id}">${review.like_count}</span></p>
                     <button class="like-button" data-review-id="${review.review_id}">Like</button>
+                    <button class="share-btn">Share</button>
                 `;
                 resultsDiv.appendChild(cardDiv);
             });

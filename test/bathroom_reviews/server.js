@@ -166,6 +166,21 @@ app.get('/reviews/top_grades', async (req, res) => {
   res.json(result.rows);
 });
 
+// randomly generate a bathroom that users can try
+app.get('/random-review', async (req, res) => {
+  try {
+      const result = await pool.query(`
+          SELECT r.*, b.building_name, b.floor_number, b.gender 
+          FROM reviews r
+          JOIN bathroom b ON r.bathroom_id = b.bathroom_id
+          ORDER BY RANDOM()
+          LIMIT 1;
+      `);
+      res.json(result.rows[0]);
+  } catch (error) {
+      res.status(500).send('Error fetching random review');
+  }
+});
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}/`);
