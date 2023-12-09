@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 overall_rating: document.getElementById('overall_rating').value,
                 peacefulness: document.getElementById('peacefulness').value,
                 additional_comments: document.getElementById('additional_comments').value,
+                grade: document.getElementById('grade').value, 
             }),
         });
     
@@ -42,18 +43,57 @@ document.addEventListener('DOMContentLoaded', (event) => {
     function displayRandomReview(randomReview) {
         const container = document.getElementById('random-review-container');
         const reviewHtml = `
-            <div class="review-card">
-                <h3>${randomReview.building_name} - Floor ${randomReview.floor_number} (${randomReview.gender})</h3>
-                <p>Cleanliness: ${randomReview.cleanliness}/5</p>
-                <p>Poopability: ${randomReview.poopability}/5</p>
-                <p>Overall Rating: ${randomReview.overall_rating}/5</p>
-                <p>Peacefulness: ${randomReview.peacefulness}/5</p>
-                <p>Comments: ${randomReview.additional_comments}</p>
-                <p>Likes: ${randomReview.like_count}</p>
+            <div class="card">
+            <div class="card">
+            <h3>${randomReview.building_name} - Floor ${randomReview.floor_number} (${randomReview.gender})</h3>
+            <p><strong>User:</strong> ${randomReview.username}</p>
+            <p><strong>Cleanliness:</strong> ${randomReview.cleanliness}/5</p>
+            <p><strong>Poopability:</strong> ${randomReview.poopability}/5</p>
+            <p><strong>Overall Rating:</strong> ${randomReview.overall_rating}/5</p>
+            <p><strong>Peacefulness:</strong> ${randomReview.peacefulness}/5</p>
+            <p><strong>Comments:</strong> ${randomReview.additional_comments}</p>
+            <p><strong>Likes:</strong> <span id="like-count-${randomReview.review_id}">${randomReview.like_count}</span></p>
+            <button class="like-button" data-review-id="${randomReview.review_id}">Like</button>
+            <button class="share-btn">Share</button>
             </div>`;
         container.innerHTML = reviewHtml;
+
+        document.querySelectorAll('.like-button').forEach(button => {
+            button.addEventListener('click', async (event) => {
+                const reviewId = event.target.getAttribute('data-review-id');
+                try {
+                    const response = await fetch('/reviews/like', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ review_id: reviewId })
+                    });
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const result = await response.json();
+                    
+                    // Update the like count in the DOM
+                    document.getElementById(`like-count-${reviewId}`).textContent = result.like_count;
+                } catch (error) {
+                    console.error('Error liking the review:', error);
+                }
+            });
+        });
+        document.querySelectorAll('.share-btn').forEach(button => {
+            button.addEventListener('click', async (event) => {
+                const reviewCard = event.target.closest('.card');
+                if (reviewCard) {
+                    await shareReview(reviewCard);
+                }
+            });
+        });
+      }
     }
-});
+    
+);
+
 
 
 async function likeReview(reviewId) {
@@ -131,7 +171,7 @@ async function fetchAndRenderAllReviews() {
                 await shareReview(reviewCard);
             }
         });
-    });
+    }).catch(error => console.error('Error fetching data:', error));
 }
 
 

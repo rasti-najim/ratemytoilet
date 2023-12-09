@@ -15,14 +15,14 @@ const pool = new Pool({
 });
 
 app.use(bodyParser.json());
-app.use(express.static('public'));  // Serve static files from the public directory
+app.use(express.static('public'));  
 
 
 app.post('/reviews', async (req, res) => {
-  const { username, building_name, floor, gender, cleanliness, poopability, overall_rating, peacefulness, additional_comments } = req.body;
+  const { username, building_name, floor, gender, grade, cleanliness, poopability, overall_rating, peacefulness, additional_comments} = req.body;
 
   // Insert the user if they don't exist
-  await pool.query(`INSERT INTO userTable(username, grade) VALUES ($1, floor(random() * 4 + 1)::integer) ON CONFLICT (username) DO NOTHING;`, [username]);
+  await pool.query(`INSERT INTO userTable(username, grade) VALUES ($1, $2) ON CONFLICT (username) DO NOTHING;`, [username, grade]);
 
   // Fetch bathroom_id
   let result = await pool.query(`SELECT bathroom_id FROM bathroom WHERE building_name=$1 AND floor_number=$2 AND gender=$3;`, [building_name, floor, gender]);
